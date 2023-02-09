@@ -27,7 +27,11 @@
             <Grid.ColumnDefinitions>
                 <!--Column for Contact chat list-->
                 <ColumnDefinition Width="auto"/>
+
                 <!--Column for conversation area-->
+                <ColumnDefinition />
+
+                <!--Profile Info-->
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
             <!--Title Bar-->
@@ -44,12 +48,12 @@
                                Foreground="White"
                                FontSize="22"
                                FontWeight="Bold"/>
-                    
+
                     <!--Window Buttons-->
                     <StackPanel HorizontalAlignment="Right"
                                 Margin="10, 0"
                                 Orientation="Horizontal">
-                                <Button x:Name="btnMinimize"
+                        <Button x:Name="btnMinimize"
                                         Content="{StaticResource minimize}"
                                         Click="btnMinimize_Click"
                                         Style="{StaticResource IconButtonStyle}" RenderTransformOrigin="0.04,2.67"/>
@@ -65,6 +69,82 @@
                     </StackPanel>
                 </Grid>
             </Border>
+
+            <!--Contact Chat List-->
+            <Grid Grid.Row="1" MinWidth="406">
+                <Grid.RowDefinitions>
+                    <!--Title & sesarch option, ...-->
+                    <RowDefinition Height="auto"/>
+
+                    <!--Searchbox-->
+                    <RowDefinition Height="auto"/>
+
+                    <!--Status Thumbs-->
+                    <RowDefinition Height="auto"/>
+
+                    <!--Chat List-->
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!--Title & sesarch option, ...-->
+                <Grid Height="75" Margin="15,0">
+                    <Grid.ColumnDefinitions>
+                        <!--Title-->
+                        <ColumnDefinition Width="Auto"/>
+
+                        <!--Blank-->
+                        <ColumnDefinition />
+
+                        <!--Search Button-->
+                        <ColumnDefinition Width="40"/>
+
+                        <!--More Options Button-->
+                        <ColumnDefinition Width="40"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Chats"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Center"
+                           FontSize="20"
+                           FontWeight="SemiBold"/>
+                    <!--Search Button-->
+                    <Button Grid.Column="2"
+                        x:Name="btnChatSearchButton"
+                        Content="{StaticResource search}"
+                        Style="{StaticResource IconButtonStyle}"/>
+
+                    <!--More Options Button-->
+                    <ToggleButton Grid.Column="3"
+                    x:Name="btnMoreOptions"
+                    Content="{StaticResource more}"
+                    Style="{StaticResource ToggleButtonStyle}"/>
+                </Grid>
+
+
+                <!--#region Search box-->
+                <Border Background="#dce1de"
+                    Margin="20"
+                    Grid.Row="1" 
+                    CornerRadius="15"
+                    Height="50"
+                    x:Name="searchBoxBorder"
+                        FocusManager.FocusedElement="{Binding ElementName=searchQuery}">
+                    <!--To Focus our text box when border get focus-->
+                     <!--FocusManager.FocusedElement="{Binding ElementName=searchQuery}">-->
+                    <TextBox Background="Transparent"
+                         BorderThickness="0"
+                         Name="searchQuery"
+                         Padding="12,0"
+                         Text="Search Text"
+                         VerticalContentAlignment="Center"
+                         VerticalAlignment="Stretch"    >
+                    </TextBox>
+                    <!--#endregion-->
+                    
+                    <!--#region Status Thumbnails-->
+                    
+                    <!--#endregion-->
+                </Border>
+            </Grid>
         </Grid>
     </Border>
 
