@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:ChatApp_SignalR.CustomControls"
+             xmlns:local="clr-namespace:ChatApp_SignalR.CustomControls" 
+             xmlns:viewmodels="clr-namespace:ChatApp_SignalR.ViewModels"
              mc:Ignorable="d">
     <UserControl.Resources>
         <!--Idea to is to have 2 Ellipse:
@@ -11,15 +12,16 @@
         2) Inner Ellipse for Status Image
         3) A small ellipse for profle photo of contact
         & A textblock for Contact name-->
-        <DataTemplate x:Key="thumbsTemplate">
+        
+        <DataTemplate x:Key="thumsTemplate">
             <!--Ellipse-->
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition MinHeight="55"/>
-                    <RowDefinition MinHeight="6"/>
-                    <RowDefinition MinHeight="Auto"/>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
                 </Grid.RowDefinitions>
-                
+
                 <Grid>
                     <Ellipse Name="outerEllipse"
                          Width="55"
@@ -39,15 +41,42 @@
                          VerticalAlignment="Center"
                          HorizontalAlignment="Center">
                         <!--To do: Add Status Binding-->
+                        <!--If the IsMeAddStatus=false then show the status image inside ellipse & if it is true then fill the ellipse-->
+                        <Ellipse.Style>
+                            <Style TargetType="{x:Type Ellipse}">
+                                <Setter Property="Fill" Value="49a078"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsMeStatus}" Value="false">
+                                        <Setter Property="Fill">
+                                            <Setter.Value>
+                                                <ImageBrush Stretch="UniformToFill" ImageSource="{Binding StatusImage}"/>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
                     </Ellipse>
+
+                    <!--If the IsMeAddStatus=false then hide the Add Sign-->
 
                     <Path Data="{StaticResource addSign}"
                               Fill="#dce1de"
                               VerticalAlignment="Bottom"
-                              HorizontalAlignment="Right"/>
+                              HorizontalAlignment="Right">
+                        <Path.Style>
+                            <Style TargetType="{x:Type Path}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsMeStatus}" Value="false">
+                                        <Setter Property="Visibility" Value="Hidden"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Path.Style>
+                    </Path>
 
                 </Grid>
-                
+
                 <!--Contact Profile Ellipse-->
                 <Ellipse Name="contactPhotoEllipse"
                          Width="26"
@@ -55,20 +84,35 @@
                          Stretch="Uniform"
                          StrokeThickness="2"
                          Stroke="#dce1de"
-                         StrokeDashArray="5"
-                         StrokeDashCap="Round"
-                         VerticalAlignment="Center"
-                         HorizontalAlignment="Center"/>
-                
+                         VerticalAlignment="Bottom"
+                         HorizontalAlignment="Right">
+                    <Ellipse.Fill>
+                        <ImageBrush Stretch="Uniform" ImageSource="{Binding ContactPhoto}"/>
+                    </Ellipse.Fill>
+                    <!--Also hide profile photo if the IsMeAddStatus=true-->
+                    <Ellipse.Style>
+                        <Style TargetType="{x:Type Ellipse}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsMeStatus}" Value="True">
+                                    <Setter Property="Visibility" Value="Hidden"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Ellipse.Style>
+                </Ellipse>
                 <!--Contact Name-->
+                <!--If ContactName is unspecified which can only happen in case if the Stauts is meant to be Add button here-->
                 <TextBlock Grid.Row="2"
-                           Text="Charlie"
+                           Text="{Binding ContactName,TargetNullValue=Add}"
                            TextTrimming="CharacterEllipsis"
                            TextAlignment="Center"/>
             </Grid>
         </DataTemplate>
     </UserControl.Resources>
-    <ItemsControl ItemTemplate="{StaticResource thumbsTemplate}">
+    <ItemsControl ItemTemplate="{StaticResource thumbsTemplate}" ItemsSource="{Binding statusThumbsCollection, UpdateSourceTrigger=PropertyChanged}">
+        <ItemsControl.DataContext>
+            <viewmodels:ViewModel/>
+        </ItemsControl.DataContext>
         <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
                 <StackPanel Orientation="Horizontal"></StackPanel>
