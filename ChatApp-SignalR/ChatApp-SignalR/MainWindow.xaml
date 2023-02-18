@@ -135,7 +135,6 @@
                          BorderThickness="0"
                          Name="searchQuery"
                          Padding="12,0"
-                         Text="Search Text"
                          VerticalContentAlignment="Center"
                          VerticalAlignment="Stretch"/>
                 </Border>
@@ -144,6 +143,10 @@
                     
                 <!--#region Status Thumbnails-->
                  <customcontrols:StatusThumbs Grid.Row="2"/>
+                <!--#endregion-->
+                
+                <!--#region ChatList-->
+                <customcontrols:ChatList Grid.Row="3"/>
                 <!--#endregion-->
             </Grid>
         </Grid>

@@ -9,7 +9,15 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/assets/icons.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            
+
+            <!--Default style for Path's-->
+            <Style TargetType="{x:Type Path}">
+                <Setter Property="Height" Value="20"/>
+                <Setter Property="Width" Value="20"/>
+                <Setter Property="Stretch" Value="Uniform"/>
+
+                <!--//Todo: Add animation later ...-->
+            </Style>
             <!--Style for buttons with Icon-->
             <Style x:Key="IconButtonStyle" TargetType="{x:Type Button}">
                 <Setter Property="Background" Value="Transparent"/>
@@ -24,19 +32,12 @@
                                     HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                     Data="{TemplateBinding Content}"
-                                    Fill="{TemplateBinding Foreground}"/>
+                                    Fill="{TemplateBinding Foreground}"
+                                    Style="{StaticResource {x:Type Path}}"/>
                             </Border>
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
-            </Style>
-            <!--Default style for Path's-->
-            <Style TargetType="{x:Type Path}">
-                <Setter Property="Height" Value="20"/>
-                <Setter Property="Width" Value="20"/>
-                <Setter Property="Stretch" Value="Uniform"/>
-                
-                <!--//Todo: Add animation later ...-->
             </Style>
             <Style x:Key="ToggleButtonStyle" TargetType="{x:Type ToggleButton}">
                 <Setter Property="Background" Value="Transparent"/>
@@ -51,7 +52,8 @@
                                     HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                     Data="{TemplateBinding Content}"
-                                    Fill="{TemplateBinding Foreground}"/>
+                                    Fill="{TemplateBinding Foreground}"
+                                    Style="{StaticResource {x:Type Path}}"/>
                             </Border>
                         </ControlTemplate>
                     </Setter.Value>

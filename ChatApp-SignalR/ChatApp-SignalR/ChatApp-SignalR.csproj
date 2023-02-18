@@ -8,4 +8,22 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+	  <Content Include="Assets/**/*.*">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+  </ItemGroup>
+
+  <!--<ItemGroup>
+    <Resource Include="Assets\1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\2.jpg" />
+    <Resource Include="Assets\5.jpg" />
+    <Resource Include="Assets\download.jpg" />
+  </ItemGroup>-->
+
 </Project>

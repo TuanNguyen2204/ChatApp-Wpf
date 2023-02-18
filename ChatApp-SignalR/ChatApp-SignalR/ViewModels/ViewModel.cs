@@ -13,38 +13,110 @@ namespace ChatApp_SignalR.ViewModels
 {
     public class ViewModel : INotifyPropertyChanged
     {
-        public ObservableCollection<StatusDataModel> statusThumbsCollection { get; set; }   
+        public ObservableCollection<StatusDataModel> statusThumbsCollection { get; set; }
 
-        public ViewModel()
+
+        #region StatusThumbs
+        public void LoadStatusThums()
         {
             statusThumbsCollection = new ObservableCollection<StatusDataModel>()
             {
                 //Since we want to keep first status blank for the user to add own status
-                new StatusDataModel
-                {
-                    IsMeAddStatus = true
-                },
-                new StatusDataModel
-                {
-                    ContactName = "Charlie",
-                    ContactPhoto = new Uri("/assets/1.png"),
-                    StatusImage = new Uri("/assets/5.png"),
-                    IsMeAddStatus = false
-                }, new StatusDataModel
-                {
-                    ContactName = "Matthew",
-                    ContactPhoto = new Uri("/assets/2.png"),
-                    StatusImage = new Uri("/assets/5.png"),
-                    IsMeAddStatus = false
-                }, new StatusDataModel
-                {
-                    ContactName = "Elwyn",
-                    ContactPhoto = new Uri("/assets/3.png"),
-                    StatusImage = new Uri("/assets/5.png"),
-                    IsMeAddStatus = false
-                },
+            new StatusDataModel
+            {
+                IsMeAddStatus=true
+            },
+            new StatusDataModel
+            {
+              ContactName="Mike",
+              ContactPhoto=new Uri("/assets/1.png", UriKind.RelativeOrAbsolute),
+              StatusImage=new Uri("/assets/5.jpg", UriKind.RelativeOrAbsolute),
+              IsMeAddStatus=false
+            },
+            new StatusDataModel
+            {
+              ContactName="Steve",
+              ContactPhoto=new Uri("/assets/download.jpg", UriKind.RelativeOrAbsolute),
+              StatusImage=new Uri("/assets/8.jpg", UriKind.RelativeOrAbsolute),
+              IsMeAddStatus=false
+            },
+            new StatusDataModel
+            {
+              ContactName="Will",
+              ContactPhoto=new Uri("/assets/3.jpg", UriKind.RelativeOrAbsolute),
+              StatusImage=new Uri("/assets/5.jpg", UriKind.RelativeOrAbsolute),
+              IsMeAddStatus=false
+            },
+
+            new StatusDataModel
+            {
+              ContactName="John",
+              ContactPhoto=new Uri("/assets/4.jpg", UriKind.RelativeOrAbsolute),
+              StatusImage=new Uri("/assets/3.jpg", UriKind.RelativeOrAbsolute),
+              IsMeAddStatus=false
+            },
             };
             OnPropertyChanged("statusThumbsCollection");
+        }
+        #region Property
+        #endregion
+        #region Logic
+        #endregion
+        #endregion
+        #region Chat List
+        #region Property
+        public ObservableCollection<ChatListData> Chats { get; set; }
+        #endregion
+
+        #region Logics
+        public void LoadChats()
+        {
+            Chats = new ObservableCollection<ChatListData>()
+            {
+                new ChatListData
+                {
+                    ContactName = "Charlie",
+                    ContactPhoto = new Uri("/assets/6.jpg", UriKind.RelativeOrAbsolute),
+                    Message = "Hello, How are you?",
+                    LastMessageSentTime = "Tue, 12:58 PM"
+                },
+                new ChatListData
+                {
+                    ContactName = "Charlie",
+                    ContactPhoto = new Uri("/assets/5.jpg", UriKind.RelativeOrAbsolute),
+                    Message = "Hello, How are you?",
+                    LastMessageSentTime = "Tue, 12:58 PM"
+                },
+                new ChatListData
+                {
+                    ContactName = "Charlie",
+                    ContactPhoto = new Uri("/assets/4.jpg", UriKind.RelativeOrAbsolute),
+                    Message = "Hello, How are you?",
+                    LastMessageSentTime = "Tue, 12:58 PM"
+                },
+                new ChatListData
+                {
+                    ContactName = "Charlie",
+                    ContactPhoto = new Uri("/assets/6.jpg", UriKind.RelativeOrAbsolute),
+                    Message = "Hello, How are you?",
+                    LastMessageSentTime = "Tue, 12:58 PM"
+                },
+                new ChatListData
+                {
+                    ContactName = "Charlie",
+                    ContactPhoto = new Uri("/assets/6.jpg", UriKind.RelativeOrAbsolute),
+                    Message = "Hello, How are you?",
+                    LastMessageSentTime = "Tue, 12:58 PM"
+                }
+            };
+            OnPropertyChanged();
+        }
+        #endregion
+        #endregion
+        public ViewModel()
+        {
+            LoadStatusThums();
+            LoadChats();
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
