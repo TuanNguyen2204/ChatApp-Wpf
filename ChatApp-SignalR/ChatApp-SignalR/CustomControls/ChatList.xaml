@@ -4,7 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ChatApp_SignalR.CustomControls" xmlns:viewmodels="clr-namespace:ChatApp_SignalR.ViewModels"
-             mc:Ignorable="d" MinWidth="406">
+             mc:Ignorable="d" MinWidth="406"
+             x:Name="_Chats">
     <UserControl.Resources>
         <DataTemplate x:Key="ChatButtonItemTemplate">
             <RadioButton GroupName="ChatButton">
@@ -17,6 +18,8 @@
                         <Setter Property="VerticalAlignment" Value="Center"/>
                         <Setter Property="Background" Value="Transparent"/>
                         <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Command" Value="{Binding DataContext.GetSelectedCommand, ElementName=_Chats, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Setter Property="CommandParameter" Value="{Binding}"/>
                         <Setter Property="Content" Value="{Binding ContactName}"/>
 
                         <!--to select the first chat.. it is optional. i dont prefer to check the chat automatically so i will comment it out for now-->

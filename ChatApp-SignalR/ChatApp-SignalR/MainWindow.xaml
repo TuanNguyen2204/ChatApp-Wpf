@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ChatApp_SignalR" 
-        xmlns:customcontrols="clr-namespace:ChatApp_SignalR.CustomControls"
+        xmlns:customcontrols="clr-namespace:ChatApp_SignalR.CustomControls" xmlns:viewmodels="clr-namespace:ChatApp_SignalR.ViewModels"
         mc:Ignorable="d"
         x:Name="mainWindow"
         AllowsTransparency="True"
@@ -16,6 +16,55 @@
         Title="Chat App" 
         WindowStyle="None"
         WindowStartupLocation="CenterScreen">
+    <Window.DataContext>
+        <viewmodels:ViewModel/>
+    </Window.DataContext>
+    <Window.Resources>
+        <Style x:Key="ContactInfoButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <ControlTemplate x:Key="ContactInfoButtonTemplate" TargetType="{x:Type Button}">
+            <Border 
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}">
+                <Grid VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <!--Profile Photo-->
+                        <ColumnDefinition Width="75"/>
+
+                        <!--Name & Online Status-->
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Ellipse Height="40" Width="40">
+                        <Ellipse.Fill>
+                            <ImageBrush ImageSource="{Binding ContactPhoto, FallbackValue=/assets/5.jpg, TargetNullValue=/assets/5.jpg, UpdateSourceTrigger=PropertyChanged}"
+                                    Stretch="UniformToFill"/>
+                        </Ellipse.Fill>
+                    </Ellipse>
+
+                    <Grid Grid.Column="1">
+                        <TextBlock>
+                        <!--Name-->
+                        <Run Text="{Binding ContactName,
+                             FallbackValue='Contact Name',
+                             TargetNullValue='Contact Name',
+                             UpdateSourceTrigger=PropertyChanged}"
+                             FontSize="20" FontWeight="Bold"/>
+                        <LineBreak/>
+                        <!--Online Status-->
+                        <Run Text="{Binding LastSeen, 
+                             FallbackValue= 'Last Seen',
+                             TargetNullValue='Last Seen',UpdateSourceTrigger=PropertyChanged}"
+                             FontSize="15"/>
+                        </TextBlock>
+                    </Grid>
+                </Grid>
+            </Border>
+        </ControlTemplate>
+    </Window.Resources>
     <!--Structuring MainWindow-->
     <Border
         CornerRadius="20"
@@ -130,26 +179,73 @@
                     x:Name="searchBoxBorder"
                         FocusManager.FocusedElement="{Binding ElementName=searchQuery}">
                     <!--To Focus our text box when border get focus-->
-                     <!--FocusManager.FocusedElement="{Binding ElementName=searchQuery}">-->
+                    <!--FocusManager.FocusedElement="{Binding ElementName=searchQuery}">-->
                     <TextBox Background="Transparent"
                          BorderThickness="0"
                          Name="searchQuery"
                          Padding="12,0"
+                         Text="Search Text"
                          VerticalContentAlignment="Center"
                          VerticalAlignment="Stretch"/>
                 </Border>
 
                 <!--#endregion-->
-                    
+
                 <!--#region Status Thumbnails-->
-                 <customcontrols:StatusThumbs Grid.Row="2"/>
+                <customcontrols:StatusThumbs Grid.Row="2"/>
                 <!--#endregion-->
-                
+
                 <!--#region ChatList-->
                 <customcontrols:ChatList Grid.Row="3"/>
                 <!--#endregion-->
             </Grid>
+
+            <!--#region Conversation Screen-->
+            <Grid Grid.Row="1" Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <!--Conversation Header-->
+                    <RowDefinition Height="Auto"/>
+
+                    <!--Body-->
+                    <RowDefinition/>
+
+                    <!--Reply popup-->
+                    <RowDefinition Height="Auto"/>
+
+                    <!--Send Message Box-->
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid Height="75" VerticalAlignment="Center" Margin="0,0,15,0">
+                    <Grid.ColumnDefinitions>
+                        <!--Contact Header Name & Online Status-->
+                        <ColumnDefinition/>
+
+                        <!--Search Message Button-->
+                        <ColumnDefinition Width="50"/>
+
+                        <!--More Options-->
+                        <ColumnDefinition Width="50"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!--Contact Info Button-->
+                    <Button Template="{StaticResource ContactInfoButtonTemplate}" 
+                            Style="{StaticResource ContactInfoButtonStyle}"/>
+
+                    <!--Search Button-->
+                    <Button Grid.Column="1"
+                            Style="{StaticResource IconButtonStyle}"
+                            Content="{StaticResource search}"/>
+
+                    <!--More Option button-->
+                    <ToggleButton Grid.Column="2"
+                    Content="{StaticResource more}"
+                    Style="{StaticResource ToggleButtonStyle}"/>
+                </Grid>
+                <!--Conversation Messages Body-->
+                <customcontrols:Conversation Grid.Row="1"/>
+            </Grid>
+            <!--#endregion-->
         </Grid>
     </Border>
-
 </Window>
