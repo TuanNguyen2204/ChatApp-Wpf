@@ -38,16 +38,6 @@ namespace ChatApp_SignalR
             WindowState = WindowState.Minimized;
         }
 
-        private void btnMaximize_Click(object sender, RoutedEventArgs e)
-        {
-            //To maximize the window when window is normal and vice versa
-            if (WindowState == WindowState.Normal)
-            {
-                WindowState = WindowState.Maximized;
-            }
-            else WindowState = WindowState.Normal;
-        }
-
         private void btnClose_Click(object sender, RoutedEventArgs e)
         {
             //To close the application

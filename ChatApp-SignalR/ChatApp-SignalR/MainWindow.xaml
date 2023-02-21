@@ -11,9 +11,8 @@
         Background="Transparent"
         FontSize="15"
         ResizeMode="NoResize"
-        Height="768" 
-        Width="1024"
         Title="Chat App" 
+        WindowState="Maximized"
         WindowStyle="None"
         WindowStartupLocation="CenterScreen">
     <Window.DataContext>
@@ -106,10 +105,6 @@
                         <Button x:Name="btnMinimize"
                                         Content="{StaticResource minimize}"
                                         Click="btnMinimize_Click"
-                                        Style="{StaticResource IconButtonStyle}" RenderTransformOrigin="0.04,2.67"/>
-                        <Button x:Name="btnMaximize"
-                                        Content="{StaticResource maximize}"
-                                        Click="btnMaximize_Click"
                                         Style="{StaticResource IconButtonStyle}" RenderTransformOrigin="0.04,2.67"/>
                         <Button x:Name="btnClose"
                                         Content="{StaticResource close}"
@@ -244,8 +239,45 @@
                 </Grid>
                 <!--Conversation Messages Body-->
                 <customcontrols:Conversation Grid.Row="1"/>
+                
+                <!--Text to sent message-->
+                <Grid Grid.Row="2">
+                    <Border Background="#dce1de" CornerRadius="15" Height="50"
+                            Margin="15, 8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <!--Textbox Button-->
+                                <ColumnDefinition/>
+                                
+                                <!--Attachment Button & Send Message button-->
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox Background="Transparent" x:Name="MessageBox" Padding="12,0" BorderThickness="0"
+                                     VerticalAlignment="Stretch"
+                                     VerticalContentAlignment="Center"
+                                     Text="{Binding MessageText}">
+                                
+                            </TextBox>
+
+                            <!--Attachment Button & Send Message button-->
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <!--To Do Command-->
+                                <Button Content="{StaticResource attach}" x:Name="AttachButton" Style="{StaticResource IconButtonStyle}"/>
+                                <Button Content="{StaticResource send}" x:Name="SentButton" Style="{StaticResource IconButtonStyle}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
             </Grid>
             <!--#endregion-->
+            
+            <!--#region ContactInfo-->
+            <!--Contact Info-->
+            <customcontrols:ContactInfo x:Name="ContactInfoScreen" Grid.Row="1" Grid.Column="2"/>
+            <!--#endregion-->
+            
+            
         </Grid>
     </Border>
 </Window>

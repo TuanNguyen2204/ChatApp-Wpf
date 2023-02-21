@@ -159,6 +159,16 @@ namespace ChatApp_SignalR.ViewModels
                 OnPropertyChanged();
             }
         }
+        protected string messageText;
+        public string MessageText
+        {
+            get => messageText;
+            set
+            {
+                messageText = value;
+                OnPropertyChanged("MessageText");
+            }
+        }
         #endregion
 
         #region Logics

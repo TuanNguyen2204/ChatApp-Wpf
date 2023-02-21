@@ -9,25 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-	  <Content Include="Assets/**/*.*">
+	  <Resource Include="Assets/**/*.*">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
+	  </Resource>
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
   </ItemGroup>
-
-  <!--<ItemGroup>
-    <Resource Include="Assets\1.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="Assets\2.jpg" />
-    <Resource Include="Assets\5.jpg" />
-    <Resource Include="Assets\download.jpg" />
-  </ItemGroup>-->
-
 </Project>
