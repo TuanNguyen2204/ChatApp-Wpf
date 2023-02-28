@@ -11,23 +11,26 @@ namespace ChatApp_SignalR.Commands
     {
         private Action<object> execute;
         private Func<object, bool> canExecute;
-        public event EventHandler? CanExecuteChanged
+
+        public event EventHandler CanExecuteChanged
         {
-            add { 
-                CommandManager.RequerySuggested+= value;
+            add
+            {
+                CommandManager.RequerySuggested += value;
             }
             remove
             {
                 CommandManager.RequerySuggested -= value;
             }
+
         }
 
-        public bool CanExecute(object? parameter)
+        public bool CanExecute(object parameter)
         {
             return canExecute == null || canExecute(parameter);
         }
 
-        public void Execute(object? parameter)
+        public void Execute(object parameter)
         {
             execute(parameter);
         }

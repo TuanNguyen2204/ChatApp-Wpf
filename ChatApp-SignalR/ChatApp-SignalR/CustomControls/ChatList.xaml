@@ -140,16 +140,7 @@
                                                 <!--Option Buttons-->
                                                 <UniformGrid 
                                                     Grid.Column="1" 
-                                                    Columns="4">
-                                                    <Button
-                                                        Content="{StaticResource pinned}" 
-                                                        Style="{StaticResource IconButtonStyle}"/>
-                                                    <Button 
-                                                        Content="{StaticResource archive}"
-                                                        Style="{StaticResource IconButtonStyle}"/>
-                                                    <Button 
-                                                        Content="{StaticResource mute}" 
-                                                        Style="{StaticResource IconButtonStyle}"/>
+                                                    Columns="1">
                                                     <Button
                                                         Content="{StaticResource trash}"
                                                         Style="{StaticResource IconButtonStyle}"/>
@@ -187,13 +178,11 @@
                 </StackPanel>
 
                 <!--ChatList-->
+                <!--Show filter chats on search-->
                 <ItemsControl
-                ItemsSource="{Binding Chats}"
+                ItemsSource="{Binding FilteredChats}"
                 ItemTemplate="{StaticResource ChatButtonItemTemplate}"
                 Padding="0,15">
-                    <ItemsControl.DataContext>
-                        <viewmodels:ViewModel/>
-                    </ItemsControl.DataContext>
                 </ItemsControl>
             </StackPanel>
         </Grid>

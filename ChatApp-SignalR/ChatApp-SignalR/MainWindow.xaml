@@ -48,8 +48,7 @@
                         <TextBlock>
                         <!--Name-->
                         <Run Text="{Binding ContactName,
-                             FallbackValue='Contact Name',
-                             TargetNullValue='Contact Name',
+                             Mode=TwoWay,
                              UpdateSourceTrigger=PropertyChanged}"
                              FontSize="20" FontWeight="Bold"/>
                         <LineBreak/>
@@ -75,7 +74,7 @@
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <!--Column for Contact chat list-->
-                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="406"/>
 
                 <!--Column for conversation area-->
                 <ColumnDefinition />
@@ -128,7 +127,7 @@
                     <RowDefinition Height="auto"/>
 
                     <!--Chat List-->
-                    <RowDefinition Height="*"/>
+                    <RowDefinition/>
                 </Grid.RowDefinitions>
 
                 <!--Title & sesarch option, ...-->
@@ -179,9 +178,14 @@
                          BorderThickness="0"
                          Name="searchQuery"
                          Padding="12,0"
-                         Text="Search Text"
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                          VerticalContentAlignment="Center"
-                         VerticalAlignment="Stretch"/>
+                         VerticalAlignment="Stretch">
+                        <TextBox.InputBindings>
+                            <!--key Binding to Search on 'Enter' key press-->
+                            <KeyBinding Command="{Binding SearchCommand}" Key="Return"/>
+                        </TextBox.InputBindings>
+                    </TextBox>
                 </Border>
 
                 <!--#endregion-->
@@ -239,7 +243,7 @@
                 </Grid>
                 <!--Conversation Messages Body-->
                 <customcontrols:Conversation Grid.Row="1"/>
-                
+
                 <!--Text to sent message-->
                 <Grid Grid.Row="2">
                     <Border Background="#dce1de" CornerRadius="15" Height="50"
@@ -248,7 +252,7 @@
                             <Grid.ColumnDefinitions>
                                 <!--Textbox Button-->
                                 <ColumnDefinition/>
-                                
+
                                 <!--Attachment Button & Send Message button-->
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
@@ -257,7 +261,7 @@
                                      VerticalAlignment="Stretch"
                                      VerticalContentAlignment="Center"
                                      Text="{Binding MessageText}">
-                                
+
                             </TextBox>
 
                             <!--Attachment Button & Send Message button-->
@@ -271,13 +275,13 @@
                 </Grid>
             </Grid>
             <!--#endregion-->
-            
+
             <!--#region ContactInfo-->
             <!--Contact Info-->
             <customcontrols:ContactInfo x:Name="ContactInfoScreen" Grid.Row="1" Grid.Column="2"/>
             <!--#endregion-->
-            
-            
+
+
         </Grid>
     </Border>
 </Window>

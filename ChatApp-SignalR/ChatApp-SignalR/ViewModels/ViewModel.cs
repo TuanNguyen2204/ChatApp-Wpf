@@ -22,7 +22,86 @@ namespace ChatApp_SignalR.ViewModels
         public string ContactName { get; set; }
         public Uri ContactPhoto { get; set; }
         public string LastSeen { get; set; }
+        #region Search Chats
+        protected string LastSearchText { get; set; }
+        protected string mSearchText { get; set; }
+        public string SearchText
+        {
+            get => mSearchText;
+            set
+            {
+
+                //checked if value is different
+                if (mSearchText == value)
+                    return;
+
+                //Update Value
+                mSearchText = value;
+
+                //if search text is empty restore messages
+                if (string.IsNullOrEmpty(SearchText))
+                    Search();
+            }
+        }
+
+        #region Logics
+        public void Search()
+
+        {
+            //To avoid re searching same text again
+            if ((string.IsNullOrEmpty(LastSearchText) && string.IsNullOrEmpty(SearchText)) || string.Equals(LastSearchText, SearchText))
+                return;
+
+            //If searchbox is empty or chats is null pr chat cound less than 0
+            if (string.IsNullOrEmpty(SearchText) || Chats == null || Chats.Count <= 0)
+            {
+                FilteredChats = new ObservableCollection<ChatListData>(Chats ?? Enumerable.Empty<ChatListData>());
+                OnPropertyChanged("FilteredChats");
+                //Update Last search Text
+                LastSearchText = SearchText;
+
+                return;
+            }
+
+            //Now, to find all chats that contain the text in our search box
+
+            //if that chat is in Normal Unpinned Chat list find there...
+
+
+            FilteredChats = new ObservableCollection<ChatListData>(
+                Chats.Where(
+                    chat => chat.ContactName.ToLower().Contains(SearchText) //if ContactName Contains SearchText then add it in filtered chat list
+                    ||
+                    chat.Message != null && chat.Message.ToLower().Contains(SearchText) //if Message Contains SearchText then add it in filtered chat list
+                    ));
+            OnPropertyChanged(nameof(FilteredChats));
+
+            //Update Last search Text
+            LastSearchText = SearchText;
+        }
         #endregion
+
+        #region Commands
+        protected ICommand _searchCommand;
+        public ICommand SearchCommand
+        {
+            get
+            {
+                if (_searchCommand == null)
+                    _searchCommand = new CommandViewModel(Search);
+                return _searchCommand;
+            }
+            set
+            {
+                _searchCommand = value;
+            }
+        }
+
+        #endregion
+        #endregion
+        #endregion
+
+
 
         #endregion
 
@@ -78,7 +157,41 @@ namespace ChatApp_SignalR.ViewModels
 
         #region Chat List
         #region Property
-        public ObservableCollection<ChatListData> Chats { get; set; }
+        public ObservableCollection<ChatListData> mChats;
+        public ObservableCollection<ChatListData> Chats
+        {
+            get => mChats;
+            set
+            {
+                //To Change the list
+                if (mChats == value)
+                    return;
+
+                //To Update the list
+                mChats = value;
+
+                //Updating filtered chats to match
+                FilteredChats = new ObservableCollection<ChatListData>(mChats);
+                OnPropertyChanged("Chats");
+                OnPropertyChanged("FilteredChats");
+            }
+        }
+
+        //Filtering Chats
+        //private ObservableCollection<ChatListData> _filteredChats;
+        //public ObservableCollection<ChatListData> FilteredChats
+        //{
+        //    get { return _filteredChats; }
+        //    set
+        //    {
+        //        if (_filteredChats != value)
+        //        {
+        //            _filteredChats = value;
+        //            OnPropertyChanged("FilteredChats");
+        //        }
+        //    }
+        //}
+        public ObservableCollection<ChatListData> FilteredChats { get; set; }
         #endregion
 
         #region Logics
@@ -88,7 +201,7 @@ namespace ChatApp_SignalR.ViewModels
             {
                 new ChatListData
                 {
-                    ContactName = "Charlie",
+                    ContactName = "Billy",
                     ContactPhoto = new Uri("/assets/6.jpg", UriKind.RelativeOrAbsolute),
                     Message = "Hello, How are you?",
                     LastMessageSentTime = "Tue, 12:58 PM"
@@ -122,7 +235,10 @@ namespace ChatApp_SignalR.ViewModels
                     LastMessageSentTime = "Tue, 12:58 PM"
                 }
             };
+            //Update
+            OnPropertyChanged("Chats");
             OnPropertyChanged();
+
         }
         #endregion
 
@@ -131,7 +247,7 @@ namespace ChatApp_SignalR.ViewModels
         protected ICommand _getSelectedCommand;
         public ICommand GetSelectedCommand => _getSelectedCommand ??= new RelayCommand(parameter =>
         {
-            if(parameter is ChatListData v)
+            if (parameter is ChatListData v)
             {
                 //getting contact name from selected chat
                 ContactName = v.ContactName;
@@ -139,10 +255,12 @@ namespace ChatApp_SignalR.ViewModels
                 //getting contact photo from selected chat
                 ContactPhoto = v.ContactPhoto;
                 OnPropertyChanged("ContactPhoto");
+
+                LoadChatConversations(v);
             }
         });
 
-        
+
 
         #endregion
         #endregion
@@ -172,15 +290,18 @@ namespace ChatApp_SignalR.ViewModels
         #endregion
 
         #region Logics
-        public void LoadChatConversations()
+        public void LoadChatConversations(ChatListData chat)
         {
-            if(connection.State == System.Data.ConnectionState.Closed)
+            if (connection.State == System.Data.ConnectionState.Closed)
                 connection.Open();
             if (Conversations == null)
                 Conversations = new ObservableCollection<ChatConversations>();
-            using (SqlCommand command = new SqlCommand("select * from conversations where ContactName = 'Mike'", connection))
+            Conversations.Clear();
+            using (SqlCommand command = new SqlCommand("select * from conversations where ContactName=@ContactName", connection))
             {
-                using(SqlDataReader reader = command.ExecuteReader()){
+                command.Parameters.AddWithValue("@ContactName", chat.ContactName);
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
                     while (reader.Read())
                     {
                         string MsgReceivedOn = !string.IsNullOrEmpty(reader["MsgReceivedOn"].ToString()) ?
@@ -209,7 +330,7 @@ namespace ChatApp_SignalR.ViewModels
         {
             LoadStatusThums();
             LoadChats();
-            LoadChatConversations();
+            FilteredChats = new ObservableCollection<ChatListData>(mChats);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
