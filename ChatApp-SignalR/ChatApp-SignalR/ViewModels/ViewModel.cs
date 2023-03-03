@@ -23,6 +23,26 @@ namespace ChatApp_SignalR.ViewModels
         public Uri ContactPhoto { get; set; }
         public string LastSeen { get; set; }
         #region Search Chats
+
+        protected bool _isSearchBoxOpen;
+        public bool IsSearchBoxOpen
+        {
+            get => _isSearchBoxOpen;
+            set
+            {
+                if (_isSearchBoxOpen == value)
+                    return;
+
+                _isSearchBoxOpen = value;
+
+
+                if (_isSearchBoxOpen == false)
+                    //Clear Search Box
+                    SearchText = string.Empty;
+                OnPropertyChanged("IsSearchBoxOpen");
+                OnPropertyChanged("SearchText");
+            }
+        }
         protected string LastSearchText { get; set; }
         protected string mSearchText { get; set; }
         public string SearchText
@@ -42,6 +62,11 @@ namespace ChatApp_SignalR.ViewModels
                 if (string.IsNullOrEmpty(SearchText))
                     Search();
             }
+        }
+
+        public void OpenSearchBox()
+        {
+            IsSearchBoxOpen = true;
         }
 
         #region Logics
@@ -79,6 +104,16 @@ namespace ChatApp_SignalR.ViewModels
             //Update Last search Text
             LastSearchText = SearchText;
         }
+
+        public void ClearSearchBox()
+        {
+            if (!string.IsNullOrEmpty(SearchText))
+                SearchText = string.Empty;
+            else
+                CloseSearchBox();
+        }
+
+        public void CloseSearchBox() => IsSearchBoxOpen = false;
         #endregion
 
         #region Commands
@@ -94,6 +129,43 @@ namespace ChatApp_SignalR.ViewModels
             set
             {
                 _searchCommand = value;
+            }
+        }
+
+        /// <summary>
+        /// Clear Search Command
+        /// </summary>
+        protected ICommand _clearSearchCommand;
+        public ICommand ClearSearchCommand
+        {
+            get
+            {
+                if (_clearSearchCommand == null)
+                    _clearSearchCommand = new CommandViewModel(ClearSearchBox);
+                return _clearSearchCommand;
+            }
+            set
+            {
+                _clearSearchCommand = value;
+            }
+        }
+
+
+        /// <summary>
+        /// Search Command
+        /// </summary>
+        protected ICommand _openSearchCommand;
+        public ICommand OpenSearchCommand
+        {
+            get
+            {
+                if (_openSearchCommand == null)
+                    _openSearchCommand = new CommandViewModel(OpenSearchBox);
+                return _openSearchCommand;
+            }
+            set
+            {
+                _openSearchCommand = value;
             }
         }
 
@@ -201,7 +273,7 @@ namespace ChatApp_SignalR.ViewModels
             {
                 new ChatListData
                 {
-                    ContactName = "Billy",
+                    ContactName = "Mike",
                     ContactPhoto = new Uri("/assets/6.jpg", UriKind.RelativeOrAbsolute),
                     Message = "Hello, How are you?",
                     LastMessageSentTime = "Tue, 12:58 PM"
@@ -267,29 +339,143 @@ namespace ChatApp_SignalR.ViewModels
 
         #region Conversations
         #region Property
-        protected ObservableCollection<ChatConversations> _Conversations;
+        protected ObservableCollection<ChatConversations> mConversations;
         public ObservableCollection<ChatConversations> Conversations
         {
-            get => _Conversations;
+            get => mConversations;
             set
             {
-                _Conversations = value;
-                OnPropertyChanged();
+                //To Change the list
+                if (mConversations == value)
+                    return;
+
+                //To Update the list
+                mConversations = value;
+
+                //Updating filtered chats to match
+                FilteredConversations = new ObservableCollection<ChatConversations>(mConversations);
+                OnPropertyChanged("Conversations");
+                OnPropertyChanged("FilteredConversations");
             }
         }
-        protected string messageText;
-        public string MessageText
+
+        /// <summary>
+        /// Filter Conversation
+        /// </summary>
+        public ObservableCollection<ChatConversations> FilteredConversations { get; set; }
+
+        //We will use this message text to transfer the send message value to our conversation body
+        protected string LastSearchConversationText;
+        protected string mSearchConversationText;
+        public string SearchConversationText
         {
-            get => messageText;
+            get => mSearchConversationText;
             set
             {
-                messageText = value;
-                OnPropertyChanged("MessageText");
+
+                //checked if value is different
+                if (mSearchConversationText == value)
+                    return;
+
+                //Update Value
+                mSearchConversationText = value;
+
+                //if search text is empty restore messages
+                if (string.IsNullOrEmpty(SearchConversationText))
+                    SearchInConversation();
+            }
+        }
+
+        protected bool _isSearchConversationBoxOpen;
+        public bool IsSearchConversationBoxOpen
+        {
+            get => _isSearchConversationBoxOpen;
+            set
+            {
+                if (_isSearchConversationBoxOpen == value)
+                    return;
+
+                _isSearchConversationBoxOpen = value;
+
+
+                if (_isSearchConversationBoxOpen == false)
+                    //Clear Search Box
+                    SearchConversationText = string.Empty;
+                OnPropertyChanged("IsSearchConversationBoxOpen");
+                OnPropertyChanged("SearchConversationText");
+            }
+        }
+        #endregion
+        #region Command
+
+        protected ICommand _searchConversationCommand;
+        public ICommand SearchConversationCommand
+        {
+            get
+            {
+                if (_searchConversationCommand == null)
+                    _searchConversationCommand = new CommandViewModel(SearchInConversation);
+                return _searchConversationCommand;
+            }
+            set
+            {
+                _searchConversationCommand = value;
+            }
+        }
+
+        /// <summary>
+        /// Search Command
+        /// </summary>
+        protected ICommand _openConversationSearchCommand;
+        public ICommand OpenConversationSearchCommand
+        {
+            get
+            {
+                if (_openConversationSearchCommand == null)
+                    _openConversationSearchCommand = new CommandViewModel(OpenConversationSearchBox);
+                return _openConversationSearchCommand;
+            }
+            set
+            {
+                _openConversationSearchCommand = value;
+            }
+        }
+
+        /// <summary>
+        /// Clear Search Command
+        /// </summary>
+        protected ICommand _clearConversationSearchCommand;
+        public ICommand ClearConversationSearchCommand
+        {
+            get
+            {
+                if (_clearConversationSearchCommand == null)
+                    _clearConversationSearchCommand = new CommandViewModel(ClearConversationSearchBox);
+                return _clearConversationSearchCommand;
+            }
+            set
+            {
+                _clearConversationSearchCommand = value;
             }
         }
         #endregion
 
         #region Logics
+
+        public void OpenConversationSearchBox()
+        {
+            IsSearchConversationBoxOpen = true;
+        }
+
+        public void ClearConversationSearchBox()
+        {
+            if (!string.IsNullOrEmpty(SearchConversationText))
+                SearchConversationText = string.Empty;
+            else
+                CloseConversationSearchBox();
+        }
+
+        public void CloseConversationSearchBox() => IsSearchConversationBoxOpen = false;
         public void LoadChatConversations(ChatListData chat)
         {
             if (connection.State == System.Data.ConnectionState.Closed)
@@ -297,6 +483,7 @@ namespace ChatApp_SignalR.ViewModels
             if (Conversations == null)
                 Conversations = new ObservableCollection<ChatConversations>();
             Conversations.Clear();
+            FilteredConversations.Clear();
             using (SqlCommand command = new SqlCommand("select * from conversations where ContactName=@ContactName", connection))
             {
                 command.Parameters.AddWithValue("@ContactName", chat.ContactName);
@@ -319,18 +506,105 @@ namespace ChatApp_SignalR.ViewModels
                         };
                         Conversations.Add(conversation);
                         OnPropertyChanged("Conversations");
+                        FilteredConversations.Add(conversation);
+                        OnPropertyChanged("FilteredConversations");
+
                     }
                 }
             }
         }
+
+        void SearchInConversation()
+        {
+            //To avoid re searching same text again
+            if ((string.IsNullOrEmpty(LastSearchConversationText) && string.IsNullOrEmpty(SearchConversationText)) || string.Equals(LastSearchConversationText, SearchConversationText))
+                return;
+
+            //If searchbox is empty or Conversations is null pr chat cound less than 0
+            if (string.IsNullOrEmpty(SearchConversationText) || Conversations == null || Conversations.Count <= 0)
+            {
+                FilteredConversations = new ObservableCollection<ChatConversations>(Conversations ?? Enumerable.Empty<ChatConversations>());
+                OnPropertyChanged("FilteredConversations");
+
+                //Update Last search Text
+                LastSearchConversationText = SearchConversationText;
+
+                return;
+            }
+
+            //Now, to find all Conversations that contain the text in our search box
+
+            FilteredConversations = new ObservableCollection<ChatConversations>(
+                Conversations.Where(chat => chat.ReceivedMessage.ToLower().Contains(SearchConversationText) || chat.SentMessage.ToLower().Contains(SearchConversationText)));
+            OnPropertyChanged("FilteredConversations");
+
+            //Update Last search Text
+            LastSearchConversationText = SearchConversationText;
+        }
         SqlConnection connection = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\charlie.nguyen\\Documents\\LeaningSpace\\WPFLearning\\ChatApp-SignalR\\ChatApp-SignalR\\ChatApp-SignalR\\Database\\Database1.mdf;Integrated Security=True");
+        #endregion
+        #endregion
+
+        #region ContactInfo
+        #region Property
+        protected bool _IsContactInfoOpen;
+        public bool IsContactInfoOpen
+        {
+            get => _IsContactInfoOpen;
+            set
+            {
+                _IsContactInfoOpen = value;
+                OnPropertyChanged("IsContactInfoOpen");
+            }
+        }
+        #endregion
+        #region Logics
+        public void OpenContactInfo() => IsContactInfoOpen = true;
+        public void CloseContactInfo() => IsContactInfoOpen = false;
+        #endregion
+
+        #region Command
+        /// <summary>
+        /// Open ContactInfo Command
+        /// </summary>
+        protected ICommand _openContactInfoCommand;
+        public ICommand OpenContactinfoCommand
+        {
+            get
+            {
+                if (_openContactInfoCommand == null)
+                    _openContactInfoCommand = new CommandViewModel(OpenContactInfo);
+                return _openContactInfoCommand;
+            }
+            set
+            {
+                _openContactInfoCommand = value;
+            }
+        }
+
+        /// <summary>
+        /// Open ContactInfo Command
+        /// </summary>
+        protected ICommand _closeontactInfoCommand;
+        public ICommand CloseContactinfoCommand
+        {
+            get
+            {
+                if (_closeontactInfoCommand == null)
+                    _closeontactInfoCommand = new CommandViewModel(CloseContactInfo);
+                return _closeontactInfoCommand;
+            }
+            set
+            {
+                _closeontactInfoCommand = value;
+            }
+        }
         #endregion
         #endregion
         public ViewModel()
         {
             LoadStatusThums();
             LoadChats();
-            FilteredChats = new ObservableCollection<ChatListData>(mChats);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

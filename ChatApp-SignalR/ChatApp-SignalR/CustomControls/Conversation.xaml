@@ -55,7 +55,6 @@
                                         SnapsToDevicePixels="True"
                                         x:Name="border">
 
-                                        <!--Lets prepare our Model first-->
                                         <Grid>
                                             <Grid.RowDefinitions>
                                                 <!--Reply Bubble-->
@@ -248,13 +247,10 @@
         HorizontalScrollBarVisibility="Disabled"
             Grid.Row="1">
             <ItemsControl
-                ItemsSource="{Binding Conversations, UpdateSourceTrigger=PropertyChanged}"
+                ItemsSource="{Binding FilteredConversations, UpdateSourceTrigger=PropertyChanged}"
                 ItemTemplate="{StaticResource ItemTemplate}"
                 Margin="15,0,0,0"
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                <ItemsControl.DataContext>
-                    <viewmodels:ViewModel/>
-                </ItemsControl.DataContext>
                 <ItemsControl.ItemsPanel>
                     <!--Animation on message item add-->
                     <ItemsPanelTemplate>

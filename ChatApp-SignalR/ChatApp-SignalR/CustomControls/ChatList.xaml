@@ -45,6 +45,15 @@
                                                 <RowDefinition Height="Auto"/>
                                             </Grid.RowDefinitions>
 
+                                            <Border Grid.RowSpan="3"
+                                                    x:Name="bdChild"
+                                                    CornerRadius="20"
+                                                    Margin="-10"
+                                                    Background="Transparent"
+                                                    HorizontalAlignment="Stretch"
+                                                    VerticalAlignment="Stretch"/>
+
+
                                             <!--#region Contact details-->
                                             <Grid 
                                                 Grid.Row="0">
@@ -131,8 +140,9 @@
                                             <!--Height is 0 because we are going to show it on Chat Button checked event only-->
                                             <!--To-Do: Animation later-->
                                             <Grid 
+                                                x:Name="OptionsGrid"
                                                 Grid.Row="1"
-                                                Height="Auto">
+                                                Height="0">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="50"/>
                                                     <ColumnDefinition/>
@@ -149,6 +159,42 @@
                                             <!--#endregion-->
                                         </Grid>
                                     </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsChecked" Value="True">
+                                            <Trigger.EnterActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard SpeedRatio="5">
+                                                        <DoubleAnimation Storyboard.TargetName="OptionsGrid" Storyboard.TargetProperty="Height" To="50"/>
+                                                        <ColorAnimation Storyboard.TargetProperty="(Background).Color" From="Transparent" To="#49a078"/>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </Trigger.EnterActions>
+                                            <Trigger.ExitActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard SpeedRatio="5">
+                                                        <DoubleAnimation Storyboard.TargetName="OptionsGrid" Storyboard.TargetProperty="Height" To="0"/>
+                                                        <ColorAnimation Storyboard.TargetProperty="(Background).Color" From="#49a078" To="Transparent"/>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </Trigger.ExitActions>
+                                        </Trigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Trigger.EnterActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard SpeedRatio="5">
+                                                        <ColorAnimation Storyboard.TargetName="bdChild" Storyboard.TargetProperty="(Background).Color" From="Transparent" To="#dce1de"/>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </Trigger.EnterActions>
+                                            <Trigger.ExitActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard SpeedRatio="5">
+                                                        <ColorAnimation Storyboard.TargetName="bdChild" Storyboard.TargetProperty="(Background).Color" From="#dce1de" To="Transparent"/>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </Trigger.ExitActions>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
                                 </ControlTemplate>
                             </Setter.Value>
                         </Setter>

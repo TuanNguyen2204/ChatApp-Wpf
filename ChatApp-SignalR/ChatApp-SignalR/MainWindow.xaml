@@ -154,8 +154,8 @@
                     <Button Grid.Column="2"
                         x:Name="btnChatSearchButton"
                         Content="{StaticResource search}"
+                        Command="{Binding OpenSearchCommand}"
                         Style="{StaticResource IconButtonStyle}"/>
-
                     <!--More Options Button-->
                     <ToggleButton Grid.Column="3"
                     x:Name="btnMoreOptions"
@@ -172,6 +172,17 @@
                     Height="50"
                     x:Name="searchBoxBorder"
                         FocusManager.FocusedElement="{Binding ElementName=searchQuery}">
+                    <!--Hide Searchbox when no text-->
+                    <Border.Style>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSearchBoxOpen, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=False}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
                     <!--To Focus our text box when border get focus-->
                     <!--FocusManager.FocusedElement="{Binding ElementName=searchQuery}">-->
                     <TextBox Background="Transparent"
@@ -181,9 +192,13 @@
                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                          VerticalContentAlignment="Center"
                          VerticalAlignment="Stretch">
+                        
                         <TextBox.InputBindings>
                             <!--key Binding to Search on 'Enter' key press-->
                             <KeyBinding Command="{Binding SearchCommand}" Key="Return"/>
+                            
+                            <!--key Binding to Clear Search text on 'Esc' key press-->
+                            <KeyBinding Command="{Binding ClearSearchCommand}" Key="Esc"/>
                         </TextBox.InputBindings>
                     </TextBox>
                 </Border>
@@ -198,9 +213,38 @@
                 <customcontrols:ChatList Grid.Row="3"/>
                 <!--#endregion-->
             </Grid>
+            
+            
+            <!--Hide Conversation screen when no chat selected-->
+            <StackPanel Grid.Row="1" Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                <StackPanel.Style>
+                    <Style TargetType="{x:Type StackPanel}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Visibility, ElementName=GridConv}" Value="Visible">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
 
+
+                <Image Source="/Assets/connectedworld.png" Stretch="Uniform" Height="400"/>
+                <TextBlock Margin="0,10" FontSize="40" TextAlignment="Center" Text="Start Conversations!!!"/>
+            </StackPanel>
             <!--#region Conversation Screen-->
-            <Grid Grid.Row="1" Grid.Column="1">
+            <Grid x:Name="GridConv"
+                Grid.Row="1" Grid.Column="1">
+                <Grid.Style>
+                    <Style TargetType="{x:Type Grid}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ContactName}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
                 <Grid.RowDefinitions>
                     <!--Conversation Header-->
                     <RowDefinition Height="Auto"/>
@@ -228,12 +272,15 @@
                     </Grid.ColumnDefinitions>
 
                     <!--Contact Info Button-->
-                    <Button Template="{StaticResource ContactInfoButtonTemplate}" 
-                            Style="{StaticResource ContactInfoButtonStyle}"/>
+                    <Button 
+                        Command="{Binding OpenContactinfoCommand}"
+                        Template="{StaticResource ContactInfoButtonTemplate}" 
+                        Style="{StaticResource ContactInfoButtonStyle}"/>
 
                     <!--Search Button-->
                     <Button Grid.Column="1"
                             Style="{StaticResource IconButtonStyle}"
+                            Command="{Binding OpenConversationSearchCommand}"
                             Content="{StaticResource search}"/>
 
                     <!--More Option button-->

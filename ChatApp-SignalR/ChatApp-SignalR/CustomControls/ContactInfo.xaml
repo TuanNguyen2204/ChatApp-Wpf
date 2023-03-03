@@ -5,8 +5,32 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ChatApp_SignalR.CustomControls"
              mc:Ignorable="d" 
+             Width="0"
              MaxWidth="406">
+    <UserControl.Style>
+        <Style TargetType="{x:Type UserControl}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsContactInfoOpen, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard SpeedRatio="4" AccelerationRatio=".8">
+                                <DoubleAnimation Storyboard.TargetProperty="Width" From="0" To="406"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard SpeedRatio="4" DecelerationRatio="1">
+                                <DoubleAnimation Storyboard.TargetProperty="Width" From="406" To="0"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Style>
     <UserControl.Resources>
+        <!--To hide contactinfo on startup and open only when the conversation contact is selected-->
         <Style x:Key="MediaButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="105"/>
             <Setter Property="Height" Value="105"/>
@@ -38,7 +62,12 @@
             <!--Contact info and Media-->
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Button Margin="15, 0" HorizontalAlignment="Left" Content="{StaticResource close}" Style="{StaticResource IconButtonStyle}"/>
+        <Button 
+            Margin="15, 0" 
+            HorizontalAlignment="Left" 
+            Content="{StaticResource close}"
+            Command="{Binding CloseContactinfoCommand}"
+            Style="{StaticResource IconButtonStyle}"/>
         <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
             <StackPanel Margin="20">
                 <!--To Do: Open/Close animation-->
