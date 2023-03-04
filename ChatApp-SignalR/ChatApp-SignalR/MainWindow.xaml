@@ -39,7 +39,8 @@
                     </Grid.ColumnDefinitions>
                     <Ellipse Height="40" Width="40">
                         <Ellipse.Fill>
-                            <ImageBrush ImageSource="{Binding ContactPhoto, FallbackValue=/assets/5.jpg, TargetNullValue=/assets/5.jpg, UpdateSourceTrigger=PropertyChanged}"
+                            <!--<ImageBrush ImageSource="{Binding ContactPhoto, FallbackValue=/assets/5.jpg, TargetNullValue=/assets/5.jpg, UpdateSourceTrigger=PropertyChanged}"-->
+                            <ImageBrush ImageSource="{Binding ContactPhoto, UpdateSourceTrigger=PropertyChanged}"
                                     Stretch="UniformToFill"/>
                         </Ellipse.Fill>
                     </Ellipse>
@@ -160,6 +161,7 @@
                     <ToggleButton Grid.Column="3"
                     x:Name="btnMoreOptions"
                     Content="{StaticResource more}"
+                    Command="{Binding WindowsMoreOptionsCommand}"
                     Style="{StaticResource ToggleButtonStyle}"/>
                 </Grid>
 
@@ -285,7 +287,9 @@
 
                     <!--More Option button-->
                     <ToggleButton Grid.Column="2"
+                    x:Name="ConversationMoreOptions"
                     Content="{StaticResource more}"
+                    Command="{Binding ConversationMoreOptionsCommand}"
                     Style="{StaticResource ToggleButtonStyle}"/>
                 </Grid>
                 <!--Conversation Messages Body-->
@@ -393,6 +397,59 @@
             <!--#region ContactInfo-->
             <!--Contact Info-->
             <customcontrols:ContactInfo x:Name="ContactInfoScreen" Grid.Row="1" Grid.Column="2"/>
+            <!--#endregion-->
+
+            <!--#region More Options-->
+            <Popup 
+                AllowsTransparency="True"
+                PopupAnimation="Fade"
+                StaysOpen="False">
+                <Popup.Style>
+                    <Style TargetType="{x:Type Popup}">
+                        <Style.Triggers>
+                            <!--Where & Where to place popup-->
+
+                            <!--Open when More Options Button is selected-->
+                            <DataTrigger Binding="{Binding IsChecked, Mode=TwoWay, ElementName=btnMoreOptions}" Value="True">
+                                <Setter Property="PlacementTarget" Value="{Binding ElementName=btnMoreOptions}"/>
+                                <Setter Property="IsOpen" Value="{Binding IsChecked, Mode=TwoWay, ElementName=btnMoreOptions}"/>
+                                <Setter Property="HorizontalOffset" Value="0"/>
+                                <Setter Property="VerticalOffset" Value="-10"/>
+                                <Setter Property="Placement" Value="Bottom"/>
+                            </DataTrigger>
+
+                            <!--Open when More Options Button In Conversation Screen is selected-->
+                            <DataTrigger Binding="{Binding IsChecked, Mode=TwoWay, ElementName=ConversationMoreOptions}" Value="True">
+                                <Setter Property="PlacementTarget" Value="{Binding ElementName=ConversationMoreOptions}"/>
+                                <Setter Property="IsOpen" Value="{Binding IsChecked, Mode=TwoWay, ElementName=ConversationMoreOptions}"/>
+                                <Setter Property="HorizontalOffset" Value="0"/>
+                                <Setter Property="VerticalOffset" Value="-10"/>
+                                <Setter Property="Placement" Value="Bottom"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Popup.Style>
+
+                <Grid>
+                    <customcontrols:MoreOptionsPopup>
+                        <customcontrols:MoreOptionsPopup.Style>
+                            <Style TargetType="{x:Type customcontrols:MoreOptionsPopup}">
+                                <!--Hidden By Default-->
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <!--Show only when more options but is checked-->
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsChecked, Mode=TwoWay, ElementName=btnMoreOptions}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsChecked, Mode=TwoWay, ElementName=ConversationMoreOptions}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </customcontrols:MoreOptionsPopup.Style>
+                    </customcontrols:MoreOptionsPopup>
+                </Grid>
+            </Popup>
             <!--#endregion-->
 
 

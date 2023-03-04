@@ -7,7 +7,7 @@ namespace ChatApp_SignalR.Models
     public class ChatListData : INotifyPropertyChanged
     {
         public string ContactName { get; set; }
-        public Uri ContactPhoto { get; set; }
+        public byte[] ContactPhoto { get; set; }
         protected string message { get; set; }
         public string Message
         {

@@ -10,17 +10,21 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace ChatApp_SignalR.ViewModels
 {
     public class ViewModel : INotifyPropertyChanged
     {
+        //Initializing resource dictionary file
+        private readonly ResourceDictionary dictionary = Application.LoadComponent(new Uri("/ChatApp-SignalR;component/Assets/icons.xaml", UriKind.RelativeOrAbsolute)) as ResourceDictionary;
         #region Main Window 
 
         #region Property
         public string ContactName { get; set; }
-        public Uri ContactPhoto { get; set; }
+        public byte[] ContactPhoto { get; set; }
         public string LastSeen { get; set; }
         #region Search Chats
 
@@ -41,6 +45,20 @@ namespace ChatApp_SignalR.ViewModels
                     SearchText = string.Empty;
                 OnPropertyChanged("IsSearchBoxOpen");
                 OnPropertyChanged("SearchText");
+            }
+        }
+
+        //This is our list containing the Window Options..
+        private ObservableCollection<MoreOptionsMenu> _windowMoreOptionsMenuList;
+        public ObservableCollection<MoreOptionsMenu> WindowMoreOptionsMenuList
+        {
+            get
+            {
+                return _windowMoreOptionsMenuList;
+            }
+            set
+            {
+                _windowMoreOptionsMenuList = value;
             }
         }
         protected string LastSearchText { get; set; }
@@ -68,6 +86,8 @@ namespace ChatApp_SignalR.ViewModels
         {
             IsSearchBoxOpen = true;
         }
+        #endregion
+        #endregion
 
         #region Logics
         public void Search()
@@ -114,6 +134,39 @@ namespace ChatApp_SignalR.ViewModels
         }
 
         public void CloseSearchBox() => IsSearchBoxOpen = false;
+
+        #region Window: More options popup
+        void WindowMoreOptionsMenu()
+        {
+            WindowMoreOptionsMenuList = new ObservableCollection<MoreOptionsMenu>()
+            {
+                new MoreOptionsMenu()
+                {
+                 Icon = (PathGeometry)dictionary["newgroup"],
+                 MenuText="New Group"
+                },
+                new MoreOptionsMenu()
+                {
+                 Icon = (PathGeometry)dictionary["settings"],
+                 MenuText="Settings"
+                },
+            };
+            OnPropertyChanged("WindowMoreOptionsMenuList");
+        }
+        void ConversationScreenMoreOptionsMenu()
+        {
+            //To populate menu items for conversation screen options list..
+            WindowMoreOptionsMenuList = new ObservableCollection<MoreOptionsMenu>()
+            {
+                new MoreOptionsMenu()
+                {
+                 Icon = (PathGeometry)dictionary["clearchat"],
+                 MenuText="Clear Chat"
+                }
+            };
+            OnPropertyChanged("WindowMoreOptionsMenuList");
+        }
+        #endregion
         #endregion
 
         #region Commands
@@ -169,8 +222,35 @@ namespace ChatApp_SignalR.ViewModels
             }
         }
 
-        #endregion
-        #endregion
+        protected ICommand _windowsMoreOptionsCommand;
+        public ICommand WindowsMoreOptionsCommand
+        {
+            get
+            {
+                if (_windowsMoreOptionsCommand == null)
+                    _windowsMoreOptionsCommand = new CommandViewModel(WindowMoreOptionsMenu);
+                return _windowsMoreOptionsCommand;
+            }
+            set
+            {
+                _windowsMoreOptionsCommand = value;
+            }
+        }
+
+        protected ICommand _conversationMoreOptionsCommand;
+        public ICommand ConversationMoreOptionsCommand
+        {
+            get
+            {
+                if (_conversationMoreOptionsCommand == null)
+                    _conversationMoreOptionsCommand = new CommandViewModel(ConversationScreenMoreOptionsMenu);
+                return _conversationMoreOptionsCommand;
+            }
+            set
+            {
+                _conversationMoreOptionsCommand = value;
+            }
+        }
         #endregion
 
 
@@ -269,46 +349,63 @@ namespace ChatApp_SignalR.ViewModels
         #region Logics
         public void LoadChats()
         {
-            Chats = new ObservableCollection<ChatListData>()
+            //Loading chats data from db
+            if (Chats == null)
+                Chats = new ObservableCollection<ChatListData>();
+
+            //Openning Sql connection
+            connection.Open();
+            //Temporary collection
+            ObservableCollection<ChatListData> temp = new ObservableCollection<ChatListData>();
+            using (SqlCommand command = new SqlCommand("select * from contacts p left join (select a.*, row_number() over(partition by a.contactname order by a.id desc) as seqnum from conversations a ) a on a.ContactName = p.contactname and a.seqnum = 1 order by a.Id desc", connection))
             {
-                new ChatListData
+                using(SqlDataReader reader = command.ExecuteReader())
                 {
-                    ContactName = "Mike",
-                    ContactPhoto = new Uri("/assets/6.jpg", UriKind.RelativeOrAbsolute),
-                    Message = "Hello, How are you?",
-                    LastMessageSentTime = "Tue, 12:58 PM"
-                },
-                new ChatListData
-                {
-                    ContactName = "Peter",
-                    ContactPhoto = new Uri("/assets/5.jpg", UriKind.RelativeOrAbsolute),
-                    Message = "Hello, How are you?",
-                    LastMessageSentTime = "Tue, 12:58 PM"
-                },
-                new ChatListData
-                {
-                    ContactName = "Elwyn",
-                    ContactPhoto = new Uri("/assets/4.jpg", UriKind.RelativeOrAbsolute),
-                    Message = "Hello, How are you?",
-                    LastMessageSentTime = "Tue, 12:58 PM"
-                },
-                new ChatListData
-                {
-                    ContactName = "Charlie",
-                    ContactPhoto = new Uri("/assets/6.jpg", UriKind.RelativeOrAbsolute),
-                    Message = "Hello, How are you?",
-                    LastMessageSentTime = "Tue, 12:58 PM"
-                },
-                new ChatListData
-                {
-                    ContactName = "Charlie",
-                    ContactPhoto = new Uri("/assets/6.jpg", UriKind.RelativeOrAbsolute),
-                    Message = "Hello, How are you?",
-                    LastMessageSentTime = "Tue, 12:58 PM"
+                    //To avoid duplication
+                    string lastItem = string.Empty;
+                    string newItem = string.Empty;
+                    while (reader.Read()) {
+                        string time = string.Empty;
+                        string lastMessage = string.Empty;
+                        if (!string.IsNullOrEmpty(reader["msgReceivedOn"].ToString()))
+                        {
+                            time = Convert.ToDateTime(reader["MsgReceivedOn"].ToString()).ToString("ddd hh:mm tt");
+                            lastMessage = reader["ReceivedMsgs"].ToString();
+                        }
+                        //else if we have sent last message then update accordingly...
+                        if (!string.IsNullOrEmpty(reader["MsgSentOn"].ToString()))
+                        {
+                            time = Convert.ToDateTime(reader["MsgSentOn"].ToString()).ToString("ddd hh:mm tt");
+                            lastMessage = reader["SentMsgs"].ToString();
+                        }
+                        //if the chat is new or we are starting new conversation which means there will be no previous sent or received msgs in that case..
+                        //show 'Start new conversation' message...
+                        if (string.IsNullOrEmpty(lastMessage))
+                            lastMessage = "Start new conversation";
+
+                        //Update data in model...
+                        ChatListData chat = new ChatListData()
+                        {
+                            ContactPhoto = (byte[])reader["photo"],
+                            ContactName = reader["contactname"].ToString(),
+                            Message = lastMessage,
+                            LastMessageSentTime = time
+                        };
+
+                        //Update 
+                        newItem = reader["contactname"].ToString();
+
+                        //If last added chat contact is not same as new one then only add
+                        if (lastItem != newItem)
+                            temp.Add(chat);
+                        lastItem = newItem;
+                    }
                 }
-            };
-            //Update
-            OnPropertyChanged("Chats");
+            }
+
+            Chats = temp;
+                //Update
+                OnPropertyChanged("Chats");
             OnPropertyChanged();
 
         }
@@ -583,6 +680,7 @@ namespace ChatApp_SignalR.ViewModels
                         FilteredConversations.Add(conversation);
                         OnPropertyChanged("FilteredConversations");
 
+                        chat.Message = !string.IsNullOrEmpty(reader["ReceivedMsgs"].ToString()) ? reader["ReceivedMsgs"].ToString() : reader["SentMsgs"].ToString();
                     }
                 }
             }
@@ -644,10 +742,15 @@ namespace ChatApp_SignalR.ViewModels
                 FilteredConversations.Add(conversation);
                 Conversations.Add(conversation);
 
+                UpdateChatAndMoveUp(Chats, conversation);
+                UpdateChatAndMoveUp(FilteredChats, conversation);
+
                 //Clear Message properties and textbox when message is sent
                 MessageText = string.Empty;
                 IsThisAReplyMessage = false;
                 MessageToReplyText = string.Empty;
+
+                
 
                 //Update
                 OnPropertyChanged("FilteredConversations");
@@ -656,6 +759,28 @@ namespace ChatApp_SignalR.ViewModels
                 OnPropertyChanged("IsThisAReplyMessage");
                 OnPropertyChanged("MessageToReplyText");
 
+            }
+        }
+
+        //Move the chat contact on top when new message is sent or received
+        protected void UpdateChatAndMoveUp(ObservableCollection<ChatListData> chatList, ChatConversations conversation)
+        {
+            //Check if the message sent is to the selected contact or not...
+            var chat = chatList.FirstOrDefault(x => x.ContactName == ContactName);
+
+            //if found
+            if (chat != null)
+            {
+                //Update Contact Chat Last Message and Message Time..
+                chat.Message = MessageText;
+                chat.LastMessageSentTime = conversation.MsgSentOn;
+
+                //Move Chat on top when new message is received/sent...
+                chatList.Move(chatList.IndexOf(chat), 0);
+
+                //Update Collections
+                OnPropertyChanged("Chats");
+                OnPropertyChanged("FilteredChats");
             }
         }
 
