@@ -60,14 +60,33 @@
                                                 <!--Reply Bubble-->
                                                 <RowDefinition Height="Auto"/>
 
+                                                <!--Reply Message Bubble-->
+                                                <RowDefinition/>
+                                                
                                                 <!--Message Bubble-->
                                                 <RowDefinition/>
 
                                                 <!--Message Time-->
                                                 <RowDefinition Height="Auto"/>
                                             </Grid.RowDefinitions>
+
+                                            <DockPanel Grid.Row="1">
+                                                <TextBlock
+                            Text="{Binding MessageToReplyText, UpdateSourceTrigger=PropertyChanged}">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="{x:Type TextBlock}">
+                                                            <Setter Property="FontSize" Value="15"/>
+                                                            <Setter Property="FontWeight" Value="SemiBold"/>
+                                                            <Setter Property="HorizontalAlignment" Value="Left"/>
+                                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                                            <Setter Property="TextWrapping" Value="Wrap"/>
+                                                            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </DockPanel>
                                             <Grid
-                                                Grid.Row="1">
+                                                Grid.Row="2">
                                                 <Grid.ColumnDefinitions>
                                                     <!--Column Reply Button-->
                                                     <ColumnDefinition Width="Auto"/>
@@ -104,7 +123,6 @@
                                                         </Style>
                                                     </Border.Style>
 
-                                                    <!--Message text-->
                                                     <!--Dockpanel is used here to expand according to message length and max width is a limit to expand to..-->
                                                     <DockPanel 
                                     MaxHeight="700">
@@ -124,10 +142,12 @@
                                         Style="{StaticResource IconButtonStyle}"/>
                                             </Grid>
 
+                                            
+
                                             <!--Message Time-->
                                             <TextBlock
                                                 x:Name="messageTime"
-                                    Grid.Row="2"
+                                    Grid.Row="3"
                                                 Opacity="0">
                                                 <TextBlock.Style>
                                                     <Style TargetType="{x:Type TextBlock}">

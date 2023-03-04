@@ -291,8 +291,60 @@
                 <!--Conversation Messages Body-->
                 <customcontrols:Conversation Grid.Row="1"/>
 
+                <!--Reply a specific message-->
+                <Border
+                CornerRadius="15"
+                Background="#dce1de"
+                Margin="15"
+                Grid.Row="2">
+                    <Border.Style>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="Visibility" Value="Visible"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding MessageToReplyText}" Value="">
+                                    <!--if there is no text in Message To Reply or User didn't click the reply button then hide the reply border popup-->
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!--Message to reply text Container-->
+                        <DockPanel Margin="20">
+                            <TextBlock
+                            Text="{Binding MessageToReplyText, UpdateSourceTrigger=PropertyChanged}">
+                                <TextBlock.Style>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Setter Property="FontSize" Value="15"/>
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                        <Setter Property="HorizontalAlignment" Value="Left"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="TextWrapping" Value="Wrap"/>
+                                        <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DockPanel>
+
+                        <!--Button to close the reply popup-->
+                        <Button
+                        Margin="10,0"
+                        HorizontalAlignment="Center"
+                        Content="{StaticResource close}"
+                        Grid.Column="1"
+                        Style="{StaticResource IconButtonStyle}"
+                        Command="{Binding CancelReplyCommand}"/>
+                    </Grid>
+                </Border>
+
                 <!--Text to sent message-->
-                <Grid Grid.Row="2">
+                <Grid Grid.Row="3">
                     <Border Background="#dce1de" CornerRadius="15" Height="50"
                             Margin="15, 8">
                         <Grid>
@@ -307,7 +359,21 @@
                             <TextBox Background="Transparent" x:Name="MessageBox" Padding="12,0" BorderThickness="0"
                                      VerticalAlignment="Stretch"
                                      VerticalContentAlignment="Center"
-                                     Text="{Binding MessageText}">
+                                     Text="{Binding MessageText, UpdateSourceTrigger=PropertyChanged}">
+                                <!--Set Focus on MessageBox when FocusMessageBox = true-->
+                                <TextBox.Style>
+                                    <Style TargetType="{x:Type TextBox}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding FocusMessageBox, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                                <Setter Property="FocusManager.FocusedElement" Value="{Binding ElementName=MessageBox}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                                <TextBox.InputBindings>
+                                    <!--key Binding to Send Message on 'Enter' key press-->
+                                    <KeyBinding Command="{Binding SendMessageCommand}" CommandParameter="{Binding}" Key="Return"/>
+                                </TextBox.InputBindings>
 
                             </TextBox>
 
@@ -315,7 +381,8 @@
                             <StackPanel Grid.Column="1" Orientation="Horizontal">
                                 <!--To Do Command-->
                                 <Button Content="{StaticResource attach}" x:Name="AttachButton" Style="{StaticResource IconButtonStyle}"/>
-                                <Button Content="{StaticResource send}" x:Name="SentButton" Style="{StaticResource IconButtonStyle}"/>
+                                <Button Content="{StaticResource send}" x:Name="SentButton" Style="{StaticResource IconButtonStyle}"
+                                        Command="{Binding SendMessageCommand}"/>
                             </StackPanel>
                         </Grid>
                     </Border>

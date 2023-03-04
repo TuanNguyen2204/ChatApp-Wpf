@@ -15,5 +15,7 @@ namespace ChatApp_SignalR.Models
         public string MsgSentOn { get; set; }
         public bool IsMessageReceived { get; set; }
         public bool MessageContainsReply { get; set; }
+
+        public string MessageToReplyText { get; set; } 
     }
 }

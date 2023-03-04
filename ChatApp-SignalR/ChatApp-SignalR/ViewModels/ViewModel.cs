@@ -365,6 +365,16 @@ namespace ChatApp_SignalR.ViewModels
         public ObservableCollection<ChatConversations> FilteredConversations { get; set; }
 
         //We will use this message text to transfer the send message value to our conversation body
+        protected string messageText;
+        public string MessageText
+        {
+            get => messageText;
+            set
+            {
+                messageText = value;
+                OnPropertyChanged("MessageText");
+            }
+        }
         protected string LastSearchConversationText;
         protected string mSearchConversationText;
         public string SearchConversationText
@@ -385,6 +395,10 @@ namespace ChatApp_SignalR.ViewModels
                     SearchInConversation();
             }
         }
+        
+        public bool FocusMessageBox { get; set; }
+        public bool IsThisAReplyMessage { get; set; }
+        public string MessageToReplyText { get; set; }
 
         protected bool _isSearchConversationBoxOpen;
         public bool IsSearchConversationBoxOpen
@@ -420,6 +434,65 @@ namespace ChatApp_SignalR.ViewModels
             set
             {
                 _searchConversationCommand = value;
+            }
+        }
+
+
+        /// <summary>
+        /// Reply Command
+        /// </summary>
+        protected ICommand _replyCommand;
+        public ICommand ReplyCommand => _replyCommand ??= new RelayCommand(parameter =>
+        {
+            if (parameter is ChatConversations v)
+            {
+                //if replying sender's message
+                if (v.IsMessageReceived)
+                    MessageToReplyText = v.ReceivedMessage;
+                //if replying own message
+                else
+                    MessageToReplyText = v.SentMessage;
+
+                //update
+                OnPropertyChanged("MessageToReplyText");
+
+                //Set focus on Message Box when user clicks reply button
+                FocusMessageBox = true;
+                OnPropertyChanged("FocusMessageBox");
+
+                //Flag this message as reply message
+                IsThisAReplyMessage = true;
+                OnPropertyChanged("IsThisAReplyMessage");
+            }
+        });
+
+        protected ICommand _cancelReplyCommand;
+        public ICommand CancelReplyCommand
+        {
+            get
+            {
+                if (_cancelReplyCommand == null)
+                    _cancelReplyCommand = new CommandViewModel(CancelReply);
+                return _cancelReplyCommand;
+            }
+            set
+            {
+                _cancelReplyCommand = value;
+            }
+        }
+
+        protected ICommand _sendMessageCommand;
+        public ICommand SendMessageCommand
+        {
+            get
+            {
+                if (_sendMessageCommand == null)
+                    _sendMessageCommand = new CommandViewModel(SendMessage);
+                return _sendMessageCommand;
+            }
+            set
+            {
+                _sendMessageCommand = value;
             }
         }
 
@@ -502,7 +575,8 @@ namespace ChatApp_SignalR.ViewModels
                             MsgReceivedOn = MsgReceivedOn,
                             SentMessage = reader["SentMsgs"].ToString(),
                             MsgSentOn = MsgSentOn,
-                            IsMessageReceived = string.IsNullOrEmpty(reader["ReceivedMsgs"].ToString()) ? false : true
+                            IsMessageReceived = string.IsNullOrEmpty(reader["ReceivedMsgs"].ToString()) ? false : true,
+                            MessageToReplyText = MessageToReplyText
                         };
                         Conversations.Add(conversation);
                         OnPropertyChanged("Conversations");
@@ -512,6 +586,9 @@ namespace ChatApp_SignalR.ViewModels
                     }
                 }
             }
+            //Reset reply message text when the new chat is fetched
+            MessageToReplyText = string.Empty;
+            OnPropertyChanged("MessageToReplyText");
         }
 
         void SearchInConversation()
@@ -541,6 +618,47 @@ namespace ChatApp_SignalR.ViewModels
             //Update Last search Text
             LastSearchConversationText = SearchConversationText;
         }
+
+        public void CancelReply()
+        {
+            IsThisAReplyMessage = false;
+            //Reset Reply Message Text
+            MessageToReplyText = string.Empty;
+            OnPropertyChanged("MessageToReplyText");
+        }
+
+        public void SendMessage()
+        {
+            //Send Message only when the textbox is not empty
+            if (!string.IsNullOrEmpty(MessageText))
+            {
+                var conversation = new ChatConversations()
+                {
+                    ReceivedMessage = MessageToReplyText,
+                    SentMessage = MessageText,
+                    MsgSentOn = DateTime.Now.ToString("MMM dd, hh:mm tt"),
+                    MessageContainsReply = IsThisAReplyMessage,
+                    MessageToReplyText = MessageToReplyText
+                };
+                //Add message to converstion list
+                FilteredConversations.Add(conversation);
+                Conversations.Add(conversation);
+
+                //Clear Message properties and textbox when message is sent
+                MessageText = string.Empty;
+                IsThisAReplyMessage = false;
+                MessageToReplyText = string.Empty;
+
+                //Update
+                OnPropertyChanged("FilteredConversations");
+                OnPropertyChanged("Conversations");
+                OnPropertyChanged("MessageText");
+                OnPropertyChanged("IsThisAReplyMessage");
+                OnPropertyChanged("MessageToReplyText");
+
+            }
+        }
+
         SqlConnection connection = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\charlie.nguyen\\Documents\\LeaningSpace\\WPFLearning\\ChatApp-SignalR\\ChatApp-SignalR\\ChatApp-SignalR\\Database\\Database1.mdf;Integrated Security=True");
         #endregion
         #endregion
