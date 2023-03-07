@@ -9,6 +9,7 @@
     <UserControl.Resources>
 
         <!--Idea here is to have 2 Ellipse:
+
         1) Outer Ellipse for Number of status Thickness dashes
         
         2) Inner Ellipse for Status Image
