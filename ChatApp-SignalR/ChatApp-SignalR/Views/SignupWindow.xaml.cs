@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace ChatApp_SignalR
+namespace ChatApp_SignalR.Views
 {
     /// <summary>
     /// Interaction logic for SignupWindow.xaml
@@ -23,5 +23,18 @@ namespace ChatApp_SignalR
         {
             InitializeComponent();
         }
+
+        private void btn_SignupClick(object sender, RoutedEventArgs e)
+        {
+            LoginWindow loginWindow = new LoginWindow();
+            loginWindow.Show();
+            this.Close();
+        }
+        private void btnClose_Click(object sender, RoutedEventArgs e)
+        {
+            //To close the application
+            Application.Current.Shutdown();
+        }
+
     }
 }
