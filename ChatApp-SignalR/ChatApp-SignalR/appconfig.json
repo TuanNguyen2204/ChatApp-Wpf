@@ -1,0 +1,5 @@
+{
+  "database": {
+    "connection": "Data Source=(localdb)\\ProjectModels;User ID=sa;Password=sa;Database=FinalProjectDB"
+  }
+}

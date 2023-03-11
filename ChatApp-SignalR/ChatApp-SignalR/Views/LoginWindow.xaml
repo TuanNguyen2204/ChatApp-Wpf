@@ -50,15 +50,19 @@
                 <StackPanel VerticalAlignment="Center" Margin="75 0">
                     
                     <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                             Text="abc@gmail.com"
-                             materialDesign:HintAssist.Hint="Email"
+                             Text="tuan"
+                             x:Name="UsernameTB"
+                             materialDesign:HintAssist.Hint="User name"
                              materialDesign:HintAssist.FloatingOffset="0,-20"
                              BorderBrush="#c5c8cc" Margin="0 27" BorderThickness="0 0 0 1.5"/>
                     <PasswordBox Style="{StaticResource MaterialDesignFloatingHintPasswordBox}"
                              Password="123456789"
+                                 x:Name="PasswordTB"
                              materialDesign:HintAssist.Hint="Password"
                              materialDesign:HintAssist.FloatingOffset="0,-20"
                              BorderBrush="#c5c8cc" Margin="0 27" BorderThickness="0 0 0 1.5"/>
+
+                    <Label x:Name="ErrorMessageLabel" Foreground="Red" Margin="0,0,0,0" />
 
                     <StackPanel Orientation="Vertical">
                         <Button Content="Login" Background="#05b790" Foreground="#ffffff" 

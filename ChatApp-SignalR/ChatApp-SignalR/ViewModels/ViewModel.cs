@@ -784,7 +784,8 @@ namespace ChatApp_SignalR.ViewModels
             }
         }
 
-        SqlConnection connection = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\charlie.nguyen\\Documents\\LeaningSpace\\WPFLearning\\ChatApp-SignalR\\ChatApp-SignalR\\ChatApp-SignalR\\Database\\Database1.mdf;Integrated Security=True");
+        //SqlConnection connection = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\charlie.nguyen\\Documents\\LeaningSpace\\WPFLearning\\ChatApp-SignalR\\ChatApp-SignalR\\ChatApp-SignalR\\Database\\Database1.mdf;Integrated Security=True");
+        SqlConnection connection = new SqlConnection(App.GetConnectString());
         #endregion
         #endregion
 

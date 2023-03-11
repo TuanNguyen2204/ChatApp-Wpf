@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ChatApp_SignalR.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +21,11 @@ namespace ChatApp_SignalR
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        private readonly Users user;
+        public MainWindow(Users user)
         {
             InitializeComponent();
+            this.user = user;
         }
 
         private void Border_MouseDown(object sender, MouseButtonEventArgs e)
