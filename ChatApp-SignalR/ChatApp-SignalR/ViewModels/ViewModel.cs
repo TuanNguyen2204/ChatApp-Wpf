@@ -26,6 +26,7 @@ namespace ChatApp_SignalR.ViewModels
         public string ContactName { get; set; }
         public byte[] ContactPhoto { get; set; }
         public string LastSeen { get; set; }
+
         #region Search Chats
 
         protected bool _isSearchBoxOpen;
@@ -260,47 +261,6 @@ namespace ChatApp_SignalR.ViewModels
         #region StatusThumbs
         public ObservableCollection<StatusDataModel> statusThumbsCollection { get; set; }
 
-        public void LoadStatusThums()
-        {
-            statusThumbsCollection = new ObservableCollection<StatusDataModel>()
-            {
-                //Since we want to keep first status blank for the user to add own status
-            new StatusDataModel
-            {
-                IsMeAddStatus=true
-            },
-            new StatusDataModel
-            {
-              ContactName="Mike",
-              ContactPhoto=new Uri("/assets/1.png", UriKind.RelativeOrAbsolute),
-              StatusImage=new Uri("/assets/5.jpg", UriKind.RelativeOrAbsolute),
-              IsMeAddStatus=false
-            },
-            new StatusDataModel
-            {
-              ContactName="Steve",
-              ContactPhoto=new Uri("/assets/download.jpg", UriKind.RelativeOrAbsolute),
-              StatusImage=new Uri("/assets/8.jpg", UriKind.RelativeOrAbsolute),
-              IsMeAddStatus=false
-            },
-            new StatusDataModel
-            {
-              ContactName="Will",
-              ContactPhoto=new Uri("/assets/3.jpg", UriKind.RelativeOrAbsolute),
-              StatusImage=new Uri("/assets/5.jpg", UriKind.RelativeOrAbsolute),
-              IsMeAddStatus=false
-            },
-
-            new StatusDataModel
-            {
-              ContactName="John",
-              ContactPhoto=new Uri("/assets/4.jpg", UriKind.RelativeOrAbsolute),
-              StatusImage=new Uri("/assets/3.jpg", UriKind.RelativeOrAbsolute),
-              IsMeAddStatus=false
-            },
-            };
-            OnPropertyChanged("statusThumbsCollection");
-        }
         #region Property
         #endregion
         #region Logic
@@ -347,8 +307,9 @@ namespace ChatApp_SignalR.ViewModels
         #endregion
 
         #region Logics
-        public void LoadChats()
+        public void LoadChats(Users user)
         {
+            
             //Loading chats data from db
             if (Chats == null)
                 Chats = new ObservableCollection<ChatListData>();
@@ -357,9 +318,10 @@ namespace ChatApp_SignalR.ViewModels
             connection.Open();
             //Temporary collection
             ObservableCollection<ChatListData> temp = new ObservableCollection<ChatListData>();
-            using (SqlCommand command = new SqlCommand("select * from contacts p left join (select a.*, row_number() over(partition by a.contactname order by a.id desc) as seqnum from conversations a ) a on a.ContactName = p.contactname and a.seqnum = 1 order by a.Id desc", connection))
+            using (SqlCommand command = new SqlCommand("select * from (select * from (select UserID from dbo.Users p where p.UserId = @userid) d left join (select a.*, row_number() over(partition by a.sender_id order by a.id desc) as seqnum from Conversations a ) a on a.sender_id = d.UserID and a.seqnum = 1) q join Users u on q.receive_id = u.UserId order by q.Id desc", connection))
             {
-                using(SqlDataReader reader = command.ExecuteReader())
+                command.Parameters.AddWithValue("@userid", user.UserId);
+                using (SqlDataReader reader = command.ExecuteReader())
                 {
                     //To avoid duplication
                     string lastItem = string.Empty;
@@ -384,16 +346,22 @@ namespace ChatApp_SignalR.ViewModels
                             lastMessage = "Start new conversation";
 
                         //Update data in model...
+                        var contactid = reader["receive_id"].ToString();
+                        SqlCommand command1 = new SqlCommand("Select * from Users where UserID = @contactid", connection);
+                        command1.Parameters.AddWithValue("@contactid", contactid);
+                        string contactname = reader["Username"].ToString();
+                        byte[] profilePicture = (byte[])reader["ProfilePicture"];
                         ChatListData chat = new ChatListData()
                         {
-                            ContactPhoto = (byte[])reader["photo"],
-                            ContactName = reader["contactname"].ToString(),
+                            Id = Int32.Parse(contactid),
+                            ContactPhoto = profilePicture,
+                            ContactName = contactname,
                             Message = lastMessage,
                             LastMessageSentTime = time
                         };
 
                         //Update 
-                        newItem = reader["contactname"].ToString();
+                        newItem = contactname;
 
                         //If last added chat contact is not same as new one then only add
                         if (lastItem != newItem)
@@ -654,9 +622,9 @@ namespace ChatApp_SignalR.ViewModels
                 Conversations = new ObservableCollection<ChatConversations>();
             Conversations.Clear();
             FilteredConversations.Clear();
-            using (SqlCommand command = new SqlCommand("select * from conversations where ContactName=@ContactName", connection))
+            using (SqlCommand command = new SqlCommand("select * from Conversations where receive_id=@contactid", connection))
             {
-                command.Parameters.AddWithValue("@ContactName", chat.ContactName);
+                command.Parameters.AddWithValue("@contactid", chat.Id);
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -667,7 +635,7 @@ namespace ChatApp_SignalR.ViewModels
                             Convert.ToDateTime(reader["MsgSentOn"].ToString()).ToString("MM dd,hh:mm tt") : "";
                         var conversation = new ChatConversations()
                         {
-                            ContactName = reader["ContactName"].ToString(),
+                            ContactName = chat.ContactName,
                             ReceivedMessage = reader["ReceivedMsgs"].ToString(),
                             MsgReceivedOn = MsgReceivedOn,
                             SentMessage = reader["SentMsgs"].ToString(),
@@ -845,10 +813,11 @@ namespace ChatApp_SignalR.ViewModels
         }
         #endregion
         #endregion
-        public ViewModel()
+        private Users user;
+        public ViewModel(Users user)
         {
-            LoadStatusThums();
-            LoadChats();
+            LoadChats(user);
+            this.user = user;
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

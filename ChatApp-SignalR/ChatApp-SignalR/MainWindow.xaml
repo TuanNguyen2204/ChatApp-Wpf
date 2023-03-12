@@ -15,9 +15,6 @@
         WindowState="Maximized"
         WindowStyle="None"
         WindowStartupLocation="CenterScreen">
-    <Window.DataContext>
-        <viewmodels:ViewModel/>
-    </Window.DataContext>
     <Window.Resources>
         <Style x:Key="ContactInfoButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="Background" Value="Transparent"/>
@@ -121,18 +118,29 @@
                     <!--Title & sesarch option, ...-->
                     <RowDefinition Height="auto"/>
 
-                    <!--Searchbox-->
                     <RowDefinition Height="auto"/>
 
-                    <!--Status Thumbs-->
+                    <!--Searchbox-->
                     <RowDefinition Height="auto"/>
 
                     <!--Chat List-->
                     <RowDefinition/>
                 </Grid.RowDefinitions>
+                
+                <!--My current user here-->
+                <StackPanel Orientation="Horizontal">
+                    <Ellipse Width="50" Height="50" Margin="20 20 20 20">
+                        <Ellipse.Fill>
+                            <ImageBrush x:Name="userImg" Stretch="UniformToFill" />
+                        </Ellipse.Fill>
+                    </Ellipse>
+                    <TextBlock x:Name="username" Text="{Binding Username}" VerticalAlignment="Center" />
+                    <Button Content="Profile" Width="100" Height="30" Margin="20" Click="ProfileButton_Click" />
+                    <Button Content="Logout" Width="100" Height="30" Background="Turquoise" Margin="20" Click="LogoutButton_Click" />
+                </StackPanel>
 
                 <!--Title & sesarch option, ...-->
-                <Grid Height="75" Margin="15,0">
+                <Grid Grid.Row="1" Height="75" Margin="15,0">
                     <Grid.ColumnDefinitions>
                         <!--Title-->
                         <ColumnDefinition Width="Auto"/>
@@ -169,7 +177,7 @@
                 <!--#region Search box-->
                 <Border Background="#dce1de"
                     Margin="20"
-                    Grid.Row="1" 
+                    Grid.Row="2" 
                     CornerRadius="15"
                     Height="50"
                     x:Name="searchBoxBorder"
@@ -207,9 +215,7 @@
 
                 <!--#endregion-->
 
-                <!--#region Status Thumbnails-->
-                <customcontrols:StatusThumbs Grid.Row="2"/>
-                <!--#endregion-->
+                
 
                 <!--#region ChatList-->
                 <customcontrols:ChatList Grid.Row="3"/>

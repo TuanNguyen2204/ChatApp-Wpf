@@ -57,10 +57,9 @@ namespace ChatApp_SignalR.Views
                         if (reader.Read())
                         {
                             // user exists and password matches - login successful
-                            // retrieve user info from reader and store in application state if needed
-                            // navigate to main application window
                             var user = new Users
                             {
+                                UserId = reader.GetInt32(reader.GetOrdinal("UserID")),
                                 Username = reader.GetString(reader.GetOrdinal("Username")),
                                 Email = reader.GetString(reader.GetOrdinal("Email")),
                                 Password = reader.GetString(reader.GetOrdinal("Password")),

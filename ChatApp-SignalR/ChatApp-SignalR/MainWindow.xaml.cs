@@ -1,6 +1,9 @@
 ﻿using ChatApp_SignalR.Models;
+using ChatApp_SignalR.ViewModels;
+using ChatApp_SignalR.Views;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,11 +24,24 @@ namespace ChatApp_SignalR
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly Users user;
+        private readonly Users _user;
         public MainWindow(Users user)
         {
             InitializeComponent();
-            this.user = user;
+            _user = user;
+            DataContext = new ViewModel(_user);
+            var imageBytes = _user.ProfilePicture;
+            BitmapImage imageSource = new BitmapImage();
+            using (MemoryStream stream = new MemoryStream(imageBytes))
+            {
+                stream.Position = 0;
+                imageSource.BeginInit();
+                imageSource.CacheOption = BitmapCacheOption.OnLoad;
+                imageSource.StreamSource = stream;
+                imageSource.EndInit();
+            }
+            userImg.ImageSource = imageSource;
+            username.Text = _user.Username;
         }
 
         private void Border_MouseDown(object sender, MouseButtonEventArgs e)
@@ -45,6 +61,19 @@ namespace ChatApp_SignalR
         {
             //To close the application
             Application.Current.Shutdown();
+        }
+        private void LogoutButton_Click(object sender, RoutedEventArgs e)
+        {
+            LoginWindow login = new LoginWindow();
+            login.Show();
+            Close();
+        }
+
+        private void ProfileButton_Click(object sender, RoutedEventArgs e)
+        {
+            ProfileWindow profile = new ProfileWindow(_user);
+            profile.Show();
+            Hide();
         }
     }
 }
