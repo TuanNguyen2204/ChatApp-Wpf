@@ -1,4 +1,5 @@
-﻿using ChatApp_SignalR.Models;
+﻿using ChatApp_SignalR.CustomControls;
+using ChatApp_SignalR.Models;
 using ChatApp_SignalR.ViewModels;
 using ChatApp_SignalR.Views;
 using System;
@@ -9,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -42,6 +44,15 @@ namespace ChatApp_SignalR
             }
             userImg.ImageSource = imageSource;
             username.Text = _user.Username;
+            ChatList chatList = new ChatList();
+            chatList.DataUpdated += MyUserControl_DataUpdated;
+        }
+        private void MyUserControl_DataUpdated(object sender, EventArgs e)
+        {
+            var selectedItem = myListBox.SelectedItem as ChatListData;
+
+            // Refresh the UI
+            myListBox.Items.Refresh();
         }
 
         private void Border_MouseDown(object sender, MouseButtonEventArgs e)

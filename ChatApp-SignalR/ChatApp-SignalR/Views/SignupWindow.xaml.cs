@@ -82,11 +82,11 @@ namespace ChatApp_SignalR.Views
                     command.Parameters.AddWithValue("@password", password);
                     if (avatarBytes != null)
                     {
-                        command.Parameters.AddWithValue("@Avatar", avatarBytes);
+                        command.Parameters.AddWithValue("@avatar", avatarBytes);
                     }
                     else
                     {
-                        SqlParameter imageParameter = new SqlParameter("@Avatar", SqlDbType.Image);
+                        SqlParameter imageParameter = new SqlParameter("@avatar", SqlDbType.Image);
                         imageParameter.Value = DBNull.Value;
                         command.Parameters.Add(imageParameter);
                     }

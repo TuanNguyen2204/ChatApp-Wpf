@@ -152,6 +152,7 @@
                                                     Grid.Column="1" 
                                                     Columns="1">
                                                     <Button
+                                                        Click="DeleteContact_Click"
                                                         Content="{StaticResource trash}"
                                                         Style="{StaticResource IconButtonStyle}"/>
                                                 </UniformGrid>

@@ -11,8 +11,11 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using static ChatApp_SignalR.CustomControls.ChatList;
 
 namespace ChatApp_SignalR.ViewModels
 {
@@ -23,6 +26,7 @@ namespace ChatApp_SignalR.ViewModels
         #region Main Window 
 
         #region Property
+        public int ContactId { get; set; }
         public string ContactName { get; set; }
         public byte[] ContactPhoto { get; set; }
         public string LastSeen { get; set; }
@@ -318,7 +322,7 @@ namespace ChatApp_SignalR.ViewModels
             connection.Open();
             //Temporary collection
             ObservableCollection<ChatListData> temp = new ObservableCollection<ChatListData>();
-            using (SqlCommand command = new SqlCommand("select * from (select * from (select UserID from dbo.Users p where p.UserId = @userid) d left join (select a.*, row_number() over(partition by a.sender_id order by a.id desc) as seqnum from Conversations a ) a on a.sender_id = d.UserID and a.seqnum = 1) q join Users u on q.receive_id = u.UserId order by q.Id desc", connection))
+            using (SqlCommand command = new SqlCommand("select * from (select * from (select UserID from dbo.Users p where p.UserId = @userid) d right join (select a.*, row_number() over(partition by a.sender_id order by a.id desc) as seqnum from Conversations a ) a on a.sender_id = d.UserID and a.seqnum = 1) q join Users u on q.receive_id = u.UserId where q.sender_id = @userid order by q.Id desc", connection))
             {
                 command.Parameters.AddWithValue("@userid", user.UserId);
                 using (SqlDataReader reader = command.ExecuteReader())
@@ -373,7 +377,7 @@ namespace ChatApp_SignalR.ViewModels
 
             Chats = temp;
                 //Update
-                OnPropertyChanged("Chats");
+            OnPropertyChanged("Chats");
             OnPropertyChanged();
 
         }
@@ -386,6 +390,7 @@ namespace ChatApp_SignalR.ViewModels
         {
             if (parameter is ChatListData v)
             {
+                ContactId = v.Id;
                 //getting contact name from selected chat
                 ContactName = v.ContactName;
                 OnPropertyChanged("ContactName");
